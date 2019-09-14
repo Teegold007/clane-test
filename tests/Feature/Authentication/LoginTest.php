@@ -15,20 +15,17 @@ class LoginTest extends TestCase
      */
     public function testLoginRequiresEmailAndPassword()
     {
-        $this->json('POST', 'api/login')
+        $this->json('POST', 'api/v1/login')
             ->assertStatus(422)
-            ->assertJson([
-                'email' => ['The email field is required.'],
-                'password' => ['The password field is required.'],
-            ]);
+            ;
     }
 
 
     public function testUserLoginsSuccessfully()
     {
-        $payload = ['email' => 'clane@test.com', 'password' => '12345'];
+        $payload = ['email' => 'clane@test.com', 'password' => '123456'];
 
-        $this->json('POST', 'api/login', $payload)
+        $this->json('POST', 'api/v1/login', $payload)
             ->assertStatus(200)
             ->assertJsonStructure([
                 'data' => [
