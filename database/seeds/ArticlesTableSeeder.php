@@ -18,15 +18,8 @@ class ArticlesTableSeeder extends Seeder
         $faker = \Faker\Factory::create();
 
 
-        for ($i = 0; $i < 10; $i++)
-        {
-            Article::create([
-                'title' => $faker->sentence,
-                'body' => $faker->paragraph,
-                'user_id' => 1,
-                'ratings' =>$faker->unique(true)->numberBetween(1, 5)
-            ]);
-        }
+        factory(App\Article::class, 10)->create();
+
     }
 
 }

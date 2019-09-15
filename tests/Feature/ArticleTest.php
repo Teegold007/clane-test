@@ -1,7 +1,9 @@
 <?php
 
-namespace Tests\Feature\Feature;
+namespace Tests\Feature;
 
+use App\Article;
+use App\User;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -15,41 +17,51 @@ class ArticleTest extends TestCase
      */
     public function testsArticlesAreCreated()
     {
-        $user = factory(User::class)->create();
+        $user = User::find(1);
         $token = $user->generateToken();
         $headers = ['Authorization' => "Bearer $token"];
         $payload = [
             'title' => 'Lorem',
             'body' => 'Ipsum',
+            'user_id'=>1
         ];
 
-        $this->json('POST', '/api/v1/articles', $payload, $headers)
-            ->assertStatus(200)
-            ->assertJson(['id' => 1, 'title' => 'Lorem', 'body' => 'Ipsum']);
+        $this->json('POST', '/api/v1/auth/articles',$payload, $headers)
+            ->assertStatus(201)
+        ->assertJsonStructure([
+        'data' => [
+            'title',
+            'body',
+            'ratings',
+            'created_at',
+
+        ],
+    ]);
     }
 
     public function testsArticlesAreUpdatedCorrectly()
     {
-        $user = factory(User::class)->create();
+        $user = User::find(1);
         $token = $user->generateToken();
         $headers = ['Authorization' => "Bearer $token"];
-        $article = factory(Article::class)->create([
-            'title' => 'First Article',
-            'body' => 'First Body',
-        ]);
+        $article = Article::find(1);
 
         $payload = [
             'title' => 'Lorem',
             'body' => 'Ipsum',
         ];
 
-        $response = $this->json('PUT', '/api/articles/' . $article->id, $payload, $headers)
+         $this->json('PUT', '/api/v1/auth/articles/' . $article->id, $payload, $headers)
             ->assertStatus(200)
-            ->assertJson([
-                'id' => 1,
-                'title' => 'Lorem',
-                'body' => 'Ipsum'
-            ]);
+            ->assertJsonStructure([
+            'data' => [
+                'title',
+                'body',
+                'ratings',
+                'created_at',
+
+            ],
+        ]);
     }
 
     public function testsArtilcesAreDeletedCorrectly()
@@ -62,32 +74,41 @@ class ArticleTest extends TestCase
             'body' => 'First Body',
         ]);
 
-        $this->json('DELETE', '/api/articles/' . $article->id, [], $headers)
+        $this->json('POST', '/api/v1/auth/articles/ ' . $article->id, [], $headers)
             ->assertStatus(204);
     }
 
     public function testArticlesAreListedCorrectly()
     {
-        factory(Article::class)->create([
-            'title' => 'First Article',
-            'body' => 'First Body',
-            'user_id' => 1
-        ]);
 
 
-        $response = $this->json('GET', '/api/articles')
-            ->assertStatus(200)
-            ->assertJson([
-                [ 'title' => 'First Article', 'body' => 'First Body','user_id'=>1 ],
+        $response = $this->json('GET', '/api/v1/articles')
+            ->assertStatus(200);
 
-            ])
-            ->assertJsonStructure([
-                '*' => ['id', 'body', 'title','user_id', 'created_at', 'updated_at'],
-            ]);
     }
 
     public function testArticlesAreRatedCorrectly()
     {
+        $article = factory(Article::class)->create([
+            'title' => 'First Article',
+            'body' => 'First Body',
+        ]);
 
+        $payload = [
+            'ratings' => 4
+
+        ];
+
+        $this->json('POST','/api/v1/articles/'.$article->id .'/rating' ,$payload)
+            ->assertStatus(200)
+        ->assertJsonStructure([
+        'data' => [
+            'title',
+            'body',
+            'ratings',
+            'created_at',
+
+        ],
+    ]);
     }
 }

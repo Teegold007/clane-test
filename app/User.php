@@ -46,4 +46,13 @@ class User extends Authenticatable
 
         return $this->api_token;
     }
+
+    public function articles()
+    {
+        return $this->hasMany(Article::class);
+    }
+
+    public function ownsArticle(Article $article){
+        return auth()->id() == $article->user->id;
+    }
 }
