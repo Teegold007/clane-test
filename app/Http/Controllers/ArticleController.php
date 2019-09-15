@@ -66,6 +66,7 @@ class ArticleController extends Controller
     public function delete(Request $request, $id)
     {
         $article = Article::findOrFail($id);
+        $this->authorize('update',$article);
 
         $article->delete();
 

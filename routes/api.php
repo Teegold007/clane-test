@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 |
 */
 
-
+Route::get('articles/search', 'SearchController@search');
 
 $router->group(['prefix' => '/v1'], function () use ($router) {
 

@@ -72,6 +72,7 @@ class ArticleTest extends TestCase
         $article = factory(Article::class)->create([
             'title' => 'First Article',
             'body' => 'First Body',
+            'user_id'=> $user->id
         ]);
 
         $this->json('POST', '/api/v1/auth/articles/ ' . $article->id, [], $headers)
